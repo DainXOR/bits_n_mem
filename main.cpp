@@ -99,6 +99,11 @@ int bits4(){
 }
 
 
+int mem1(){
+
+    return 0;
+}
+
 int main() {
     bits4();
     return 0;
