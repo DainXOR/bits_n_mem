@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstdint>
-
+#include <random>
 
 /*
  * 1.-  Conversión de decimal a binario.
@@ -99,12 +99,234 @@ int bits4(){
 }
 
 
+/*
+ * a.- Recorrido de un arreglo.
+ * b.- Manipulación de una matriz. Por ejemplo: Obtener traspuesta.
+ * c.- Recorrer un arreglo de estudiantes y cada uno a su vez tiene un arreglo de calificaciones internamente,
+ *     esta cantidad es diferente para cada estudiante.
+ *     Luego usarlo para calcular el promedio de cada uno y además el % de estudiantes cuyo promedio es menor a un valor X
+ *     establecido por el usuario.
+*/
+
 int mem1(){
+    std::string array1[10];
+    std::string* array2 = new std::string[10];
+
+    for(int i = 0; i < 10; ++i){
+        *(array1 + i) = "asd";
+        *(array2 + i) = "aaaa";
+    }
+
+    for(int i = 0; i < 10; ++i){
+        std::cout << *(array1 + i) << "\n";
+        std::cout << *(array2 + i) << "\n";
+    }
+
+    return 0;
+}
+
+uint64_t randomInt() {
+    static std::random_device rd;
+    static std::mt19937_64 gen(rd());
+    static std::uniform_int_distribution<uint64_t> dist;
+    return dist(gen) % 10;
+}
+uint64_t** createMatrix(uint64_t rows, uint64_t cols){
+    uint64_t** matrix = new uint64_t*[rows];
+
+    for(uint64_t i = 0; i < rows; ++i){
+        matrix[i] = new uint64_t[cols];
+    }
+
+    return matrix;
+}
+
+template<typename Matrix>
+void fillMatrix(Matrix& matrix, uint64_t rows, uint64_t cols) {
+    for (uint64_t i = 0; i < rows; ++i) {
+        for (uint64_t j = 0; j < cols; ++j) {
+            *(*(matrix + i) + j) = randomInt();
+        }
+    }
+}
+template<typename Matrix>
+void printMatrix(Matrix& matrix, uint64_t rows, uint64_t cols){
+    for (uint64_t i = 0; i < rows; ++i) {
+        for (uint64_t j = 0; j < cols; ++j) {
+            std::cout << "---";
+        }
+        std::cout << "\n";
+
+        for (uint64_t j = 0; j < cols; ++j) {
+            std::cout << "|" << *(*(matrix + i) + j) << "|";
+        }
+        std::cout << "\n";
+    }
+
+    for (uint64_t j = 0; j < cols; ++j) {
+        std::cout << "---";
+
+    }
+
+    std::cout << "\n\n";
+}
+template<typename T, typename U>
+void transposeMatrix(T& input, U& output, size_t rows, size_t cols) {
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < cols; ++j) {
+            *(*(output + j) + i) = *(*(input + i) + j);
+        }
+    }
+}
+
+template<class T>
+void deleteMatrix(T** matrix, uint64_t rows){
+    for (size_t i = 0; i < rows; ++i){
+        delete[] *(matrix + i);
+    }
+
+    delete[] matrix;
+}
+
+int mem2(){
+    constexpr uint64_t rows = 4;
+    constexpr uint64_t cols = 4;
+
+    uint64_t matrix1[rows][cols];
+    uint64_t out1[rows][cols];
+
+    uint64_t** matrix2 = createMatrix(rows, cols);
+    uint64_t** out2 = createMatrix(rows, cols);
+
+    fillMatrix(matrix1, rows, cols);
+    fillMatrix(matrix2, rows, cols);
+
+    transposeMatrix(matrix1, out1, rows, cols);
+    transposeMatrix(matrix2, out2, rows, cols);
+
+    printMatrix(matrix1, rows, cols);
+    printMatrix(out1, rows, cols);
+
+    std::cout << "--------------------------------\n\n";
+
+    printMatrix(matrix2, rows, cols);
+    printMatrix(out2, rows, cols);
+
+
+    deleteMatrix(matrix2, rows);
+    deleteMatrix(out2, rows);
+
+    return 0;
+}
+
+struct subject {
+    std::string name = "";
+    uint8_t* grades = new uint8_t[1]{};
+};
+
+struct student {
+    std::string name = "";
+    uint8_t age = 0;
+    uint8_t level = 0;
+    subject* clases = new subject[1]{};
+};
+/*
+* c.- Recorrer un arreglo de estudiantes y cada uno a su vez tiene un arreglo de calificaciones internamente,
+*     esta cantidad es diferente para cada estudiante.
+*     Luego usarlo para calcular el promedio de cada uno y además el % de estudiantes cuyo promedio es menor a un valor X
+*     establecido por el usuario.
+*/
+int mem3(){
+    student* estudiantes = new student[1]{};
+
+    bool stopRegister = false;
+    std::string name = "";
+    uint8_t age = 0;
+    uint8_t level = 0;
+    size_t count = 0;
+    size_t subjects = 0;
+
+    while(!stopRegister){
+        std::cout << "Nombre: ";
+        std::cin >> name;
+        estudiantes[count].name = name;
+
+        std::cout << "Edad: ";
+        std::cin >> age;
+        estudiantes[count].age = age;
+
+        std::cout << "Nivel: ";
+        std::cin >> level;
+        estudiantes[count].level = level;
+
+        std::cout << "Cuantas materias desea registrar?: ";
+        std::cin >> subjects;
+
+        delete[] estudiantes[count].clases[0].grades;
+        delete[] estudiantes[count].clases;
+        estudiantes[count].clases = new subject[subjects];
+
+
+        for(size_t i = 0; i < subjects; ++i){
+            std::cout << "Nombre: ";
+            std::cin >> name;
+            estudiantes[count].clases[i].name = name;
+
+            size_t grades = 0;
+
+            std::cout << "Cuantas notas desea registrar?: ";
+            std::cin >> grades;
+
+            delete[] estudiantes[count].clases[i].grades;
+            estudiantes[count].clases[i].grades = new uint8_t[grades];
+
+            for(size_t j = 0; j < grades; ++j){
+                uint8_t nota = 0;
+                std::cout << "Nota " << i << ": ";
+                std::cin >> nota;
+                estudiantes[count].clases[i].grades[j] = nota;
+            }
+
+        }
+
+        char opcion = 'S';
+        std::cout << "Desea detener el registro? [S/N]: ";
+        std::cin >> opcion;
+
+        if(opcion == 'S'){
+            stopRegister = true;
+        }
+
+    }
 
     return 0;
 }
 
 int main() {
-    bits4();
+    std::cout << "\n\n\n\n\n";
+
+    mem3();
+
+
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
