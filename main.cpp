@@ -284,7 +284,7 @@ int mem3(){
                 uint8_t nota = 0;
                 std::cout << "Nota " << i << ": ";
                 std::cin >> nota;
-                estudiantes[count].clases[i].grades[j] = nota;
+                estudiantes[count].clases[i].grades[j] = nota - '0';
             }
 
         }
